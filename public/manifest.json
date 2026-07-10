@@ -1,0 +1,19 @@
+{
+  "name": "Stock212 — Marketplace B2B FMCG",
+  "short_name": "Stock212",
+  "description": "Commandez en gros auprès de fournisseurs FMCG certifiés",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "business"],
+  "lang": "fr",
+  "icons": [
+    { "src": "/logos.png", "sizes": "any", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Catalogue", "url": "/catalog", "description": "Parcourir le catalogue FMCG" },
+    { "name": "Mon espace", "url": "/buyer", "description": "Tableau de bord acheteur" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(~/.claude/skills/b2b-fmcg-ux/**)",
+      "Bash(python \"C:/Users/dell/.claude/skills/b2b-fmcg-ux/scripts/benchmark_report.py\" --platform \"Stock212\" --competitors \"faire,ankorstore,alibaba\")",
+      "Bash(python -c \"import sys; sys.stdout.reconfigure\\(encoding='utf-8'\\)\")",
+      "Bash(python \"C:/Users/dell/.claude/skills/b2b-fmcg-ux/scripts/benchmark_report.py\" --platform \"Stock212\" --competitors \"faire,ankorstore,alibaba\" --output benchmark.md)",
+      "Bash(python \"C:/Users/dell/.claude/skills/b2b-fmcg-ux/scripts/b2b_ux_audit.py\" --project-path ./src --output audit.md)",
+      "Bash(supabase --version)",
+      "Bash(npx supabase *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5175/)",
+      "Bash(dir /b /s \"c:\\\\Users\\\\dell\\\\Downloads\\\\Stock212_app\\\\project\\\\public\")",
+      "Bash(dir /b /s \"c:\\\\Users\\\\dell\\\\Downloads\\\\Stock212_app\\\\project\\\\src\\\\assets\")",
+      "Bash(dir /b \"c:\\\\Users\\\\dell\\\\Downloads\\\\Stock212_app\\\\project\")"
+    ]
+  }
+}
