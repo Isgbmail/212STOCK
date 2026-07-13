@@ -575,12 +575,12 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
   }, []);
 
   function getDashPath() {
-    if (!activeOrg) return '/';
-    if (activeOrg.org_type === 'seller') return '/vendor';
-    if (activeOrg.org_type === 'delivery') return '/delivery';
-    return '/buyer';
-  }
-
+  if (profile?.is_admin) return '/admin';
+  if (!activeOrg) return '/';
+  if (activeOrg.org_type === 'seller') return '/vendor';
+  if (activeOrg.org_type === 'delivery') return '/delivery';
+  return '/buyer';
+}
   return (
     <Box minH="100vh" bg="gray.50">
       {/* Announcement bar — trust signals */}
@@ -800,7 +800,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
                       <MenuItem
                         icon={<LogOut size={15} />}
                         color="red.500" fontWeight="medium"
-                        onClick={signOut}
+                        onClick={async () => { await signOut(); navigate('/auth'); }}
                         _hover={{ bg: 'red.50' }}
                       >
                         Déconnexion
@@ -1098,7 +1098,7 @@ export default function StorefrontLayout({ children }: { children: React.ReactNo
                   )}
                   <Divider my={1} />
                   <Box py={3} px={5} cursor="pointer" _hover={{ bg: 'red.50' }}
-                    onClick={() => { signOut(); onClose(); }}>
+                    onClick={async () => { await signOut(); onClose(); navigate('/auth'); }}>
                     <Text fontSize="sm" fontWeight="medium" color="red.500">Déconnexion</Text>
                   </Box>
                 </VStack>

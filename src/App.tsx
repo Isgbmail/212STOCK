@@ -251,6 +251,7 @@ function RedirectAuthenticated() {
   if (loading) return <LoadingScreen />;
   if (!user) return null;
   if (profile === null) return <LoadingScreen />;
+  if (profile.is_admin) return <Navigate to="/admin" replace />;
   if (!profile.onboarding_done) return <Navigate to="/onboarding" replace />;
   const from = (location.state as { from?: Location })?.from?.pathname;
   if (from && from !== '/auth') return <Navigate to={from} replace />;
@@ -258,7 +259,6 @@ function RedirectAuthenticated() {
   if (activeOrg?.org_type === 'delivery') return <Navigate to="/delivery" replace />;
   return <Navigate to="/buyer" replace />;
 }
-
 // Accès limité : dashboard visible, onboarding obligatoire
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth();

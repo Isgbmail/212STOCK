@@ -130,7 +130,7 @@ export function VendorLayout({ children, breadcrumbs }: CloudscapeLayoutProps) {
               { id: 'signout', text: 'Déconnexion' },
             ],
             onItemClick: ({ detail }) => {
-              if (detail.id === 'signout') signOut();
+              if (detail.id === 'signout') { signOut().then(() => navigate('/auth')); }
               else if (detail.id === 'storefront') navigate('/');
             },
           },
@@ -209,7 +209,7 @@ export function DeliveryLayout({ children, breadcrumbs }: CloudscapeLayoutProps)
               { id: 'signout', text: 'Déconnexion' },
             ],
             onItemClick: ({ detail }) => {
-              if (detail.id === 'signout') signOut();
+              if (detail.id === 'signout') { signOut().then(() => navigate('/auth')); }
               else if (detail.id === 'storefront') navigate('/');
             },
           },
@@ -287,7 +287,7 @@ export function AdminLayout({ children, breadcrumbs }: CloudscapeLayoutProps) {
               { id: 'signout', text: 'Déconnexion' },
             ],
             onItemClick: ({ detail }) => {
-              if (detail.id === 'signout') signOut();
+              if (detail.id === 'signout') { signOut().then(() => navigate('/auth')); }
               else if (detail.id === 'storefront') navigate('/');
             },
           },

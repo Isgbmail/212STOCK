@@ -1,9 +1,10 @@
 import { Box, Flex, Heading, Text, VStack, HStack, Button } from '@chakra-ui/react';
 import { Package, Clock, Phone, CheckCircle, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-
 export default function PendingApprovalPage() {
   const { profile, activeOrg, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const orgTypeLabel =
     activeOrg?.org_type === 'seller'   ? 'fournisseur' :
@@ -103,7 +104,7 @@ export default function PendingApprovalPage() {
           size="sm"
           color="gray.400"
           fontSize="xs"
-          onClick={() => signOut()}
+         onClick={async () => { await signOut(); navigate('/auth'); }}
           w="full"
         >
           Se déconnecter

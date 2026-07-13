@@ -31,22 +31,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [profileRes, membersRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
       supabase
-        .from('organisation_members')
-        .select('*, organisations(*)')
-        .eq('user_id', userId)
-        .eq('active', true),
+  .from('organisation_members')
+  .select('*, organisations(*)')
+  .eq('user_id', userId)
+  .eq('active', true)
+    .order('joined_at', { ascending: true }),
     ]);
 
     if (profileRes.data) setProfile(profileRes.data as Profile);
 
     if (membersRes.data) {
-      setMemberships(membersRes.data as OrgMember[]);
-      const orgs = membersRes.data
-        .map((m: OrgMember & { organisations?: Organisation }) => m.organisations)
-        .filter(Boolean) as Organisation[];
-      setOrganisations(orgs);
-      if (orgs.length > 0 && !activeOrg) setActiveOrg(orgs[0]);
-    }
+  setMemberships(membersRes.data as OrgMember[]);
+  const orgs = membersRes.data
+    .map((m: OrgMember & { organisations?: Organisation }) => m.organisations)
+    .filter(Boolean) as Organisation[];
+  setOrganisations(orgs);
+  setActiveOrg(prev => {
+    if (prev && orgs.some(o => o.id === prev.id)) return prev;
+    return orgs[0] ?? null;
+  });
+}
   }
 
   async function refreshProfile() {
@@ -82,9 +86,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function signOut() {
+ async function signOut() {
+  try {
     await supabase.auth.signOut();
+  } catch (err) {
+    console.error('Erreur lors de la déconnexion :', err);
+  } finally {
+    setSession(null);
+    setUser(null);
+    setProfile(null);
+    setOrganisations([]);
+    setMemberships([]);
+    setActiveOrg(null);
   }
+}
 
   return (
     <AuthContext.Provider value={{

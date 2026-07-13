@@ -238,9 +238,30 @@ export default function AuthPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedTestRole, setSelectedTestRole] = useState<'admin' | 'seller' | 'buyer' | 'delivery' | null>(null);
   const toast = useToast();
   const { isOpen: isForgotOpen, onOpen: openForgot, onClose: closeForgot } = useDisclosure();
+async function detectUserRole(userId: string): Promise<'admin' | 'seller' | 'buyer' | 'delivery' | null> {
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', userId)
+    .maybeSingle();
+  if (profileData?.is_admin) return 'admin';
 
+  const { data: memberData } = await supabase
+    .from('organisation_members')
+    .select('organisations(org_type)')
+    .eq('user_id', userId)
+    .eq('active', true)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  const orgType = (memberData?.organisations as { org_type?: string } | null)?.org_type;
+  if (orgType === 'seller' || orgType === 'delivery' || orgType === 'buyer') return orgType;
+  return null;
+}
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -259,9 +280,23 @@ export default function AuthPage() {
           status: 'success',
           duration: 5000,
         });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+     } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+
+        if (selectedTestRole && data.user) {
+          const actualRole = await detectUserRole(data.user.id);
+          if (actualRole && actualRole !== selectedTestRole) {
+            await supabase.auth.signOut();
+            const roleLabels: Record<string, string> = {
+              admin: 'Admin', seller: 'Vendeur', buyer: 'Acheteur', delivery: 'Livreur',
+            };
+            throw new Error(
+              `Ces identifiants correspondent à un compte "${roleLabels[actualRole]}", pas "${roleLabels[selectedTestRole]}". Vérifiez le rôle sélectionné.`
+            );
+          }
+        }
+        setSelectedTestRole(null);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
@@ -482,20 +517,20 @@ export default function AuthPage() {
               </Text>
               <HStack spacing={2} flexWrap="wrap">
                 {[
-                  { label: 'Admin',    emoji: '👑', email: 'dev-admin@stock212.dev',    color: 'purple' },
-                  { label: 'Vendeur',  emoji: '🏭', email: 'dev-seller@stock212.dev',   color: 'blue'   },
-                  { label: 'Acheteur', emoji: '🛒', email: 'dev-buyer@stock212.dev',    color: 'green'  },
-                  { label: 'Livreur',  emoji: '🚚', email: 'dev-delivery@stock212.dev', color: 'orange' },
-                ].map(({ label, emoji, email: e, color }) => (
+                  { label: 'Admin',    emoji: '👑', email: 'dev-admin@stock212.dev',    color: 'purple', role: 'admin' as const    },
+                  { label: 'Vendeur',  emoji: '🏭', email: 'dev-seller@stock212.dev',   color: 'blue',   role: 'seller' as const   },
+                  { label: 'Acheteur', emoji: '🛒', email: 'dev-buyer@stock212.dev',    color: 'green',  role: 'buyer' as const    },
+                  { label: 'Livreur',  emoji: '🚚', email: 'dev-delivery@stock212.dev', color: 'orange', role: 'delivery' as const },
+                ].map(({ label, emoji, email: e, color, role }) => (
                   <Button
                     key={label}
                     size="xs"
-                    variant="outline"
+                    variant={selectedTestRole === role ? 'solid' : 'outline'}
                     colorScheme={color}
                     rounded="sm"
                     fontWeight="600"
                     fontSize="11px"
-                    onClick={() => { setEmail(e); setPassword('DevStock212!'); setError(''); }}
+                    onClick={() => { setEmail(e); setPassword('DevStock212!'); setError(''); setSelectedTestRole(role); }}
                   >
                     {emoji} {label}
                   </Button>
@@ -503,7 +538,6 @@ export default function AuthPage() {
               </HStack>
             </Box>
           )}
-
           {/* Security indicators */}
           <HStack justify="center" spacing={5} mt={5} flexWrap="wrap">
             {[
